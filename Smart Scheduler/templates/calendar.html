@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Calendar - Smart Scheduler</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .calendar-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .calendar-table th, .calendar-table td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #22334c;
+            background: #23253b;
+            color: #dbefff;
+            min-width: 40px;
+        }
+        .calendar-table th {
+            background: #2274a5;
+            color: #fff;
+        }
+        .calendar-table td:hover {
+            background: #ff3445;
+            color: #fff;
+            cursor: pointer;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 280px;
+            margin: auto;
+            margin-top: 20px;
+        }
+        .calendar-header a {
+            background: #349cff;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .calendar-header a:hover {
+            background: #ff3445;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hdr-gradient">
+  <h1 class="cool-title">&#128198 Calendar</h1>
+</header>
+
+<div style="text-align:center; margin:10px;">
+    <form method="get" action="{{ url_for('calendar_view') }}">
+        <select name="month">
+            {% for m in range(1,13) %}
+                <option value="{{ m }}" {% if m==month %}selected{% endif %}>{{ calendar.month_name[m] }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="year" value="{{ year }}" style="width:80px;">
+        <button type="submit">Go</button>
+    </form>
+</div>
+
+<table class="calendar-table animate-fade" style="max-width:500px; margin:auto;">
+    <thead>
+        <tr>
+            {% for day in week_header %}
+                <th>{{ day }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for week in cal %}
+            <tr>
+                {% for day in week %}
+                    {% if day == 0 %}
+                        <td></td>
+                    {% else %}
+                        <td>{{ day }}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div style="text-align:center; margin-top:20px;">
+    <a href="{{ url_for('home') }}">&#8592; Back to Home</a>
+</div>
+
+
+
+</body>
+</html>

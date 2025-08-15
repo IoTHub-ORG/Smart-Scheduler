@@ -11,11 +11,13 @@
         }
         .calendar-table th, .calendar-table td {
             padding: 8px;
-            text-align: center;
+            vertical-align: top;
             border: 1px solid #22334c;
             background: #23253b;
             color: #dbefff;
-            min-width: 40px;
+            min-width: 80px;
+            height: 120px;
+            position: relative;
         }
         .calendar-table th {
             background: #2274a5;
@@ -24,7 +26,7 @@
         .calendar-table td:hover {
             background: #ff3445;
             color: #fff;
-            cursor: pointer;
+            cursor: default;
         }
         .calendar-header {
             display: flex;
@@ -45,12 +47,59 @@
         .calendar-header a:hover {
             background: #ff3445;
         }
+
+        /* Planner styling inside each day cell */
+        .day-number {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .note-textarea {
+            width: 100%;
+            height: 70px;
+            background: #181b29;
+            color: #dbefff;
+            border: 1px solid #349cff;
+            border-radius: 5px;
+            resize: none;
+            padding: 4px 6px;
+            font-size: 0.9rem;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            box-sizing: border-box;
+        }
+        .save-btn {
+            margin-top: 4px;
+            display: block;
+            width: 100%;
+            padding: 4px 0;
+            background: #349cff;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            user-select: none;
+            text-align: center;
+        }
+        .save-btn:hover {
+            background: #ff3445;
+        }
+        .save-message {
+    margin-top: 4px;
+    font-size: 0.85rem;
+    color: #4caf50;
+    text-align: center;
+    user-select: none;
+    height: 18px; /* reserve height so layout doesn’t shift */
+        }
+
     </style>
 </head>
 <body>
 
-    <header class="hdr-gradient">
-  <h1 class="cool-title">&#128198 Calendar</h1>
+<header class="hdr-gradient">
+    <h1 class="cool-title">&#128198; Calendar</h1>
 </header>
 
 <div style="text-align:center; margin:10px;">
@@ -65,7 +114,7 @@
     </form>
 </div>
 
-<table class="calendar-table animate-fade" style="max-width:500px; margin:auto;">
+<table class="calendar-table animate-fade" style="max-width:700px; margin:auto;">
     <thead>
         <tr>
             {% for day in week_header %}
@@ -80,7 +129,12 @@
                     {% if day == 0 %}
                         <td></td>
                     {% else %}
-                        <td>{{ day }}</td>
+                        <td data-year="{{ year }}" data-month="{{ month }}" data-day="{{ day }}">
+                            <div class="day-number">{{ day }}</div>
+                            <textarea class="note-textarea" placeholder="Add note..."></textarea>
+                            <button class="save-btn">Save</button>
+                            <div class="save-message" style="display:none;">Saved!</div>
+                        </td>
                     {% endif %}
                 {% endfor %}
             </tr>
@@ -92,7 +146,48 @@
     <a href="{{ url_for('home') }}">&#8592; Back to Home</a>
 </div>
 
+<script>
+    document.querySelectorAll('.calendar-table td[data-day]').forEach(td => {
+        const year = parseInt(td.getAttribute('data-year'));
+        const month = parseInt(td.getAttribute('data-month'));
+        const day = parseInt(td.getAttribute('data-day'));
+        const textarea = td.querySelector('.note-textarea');
+        const saveBtn = td.querySelector('.save-btn');
+        const msg = td.querySelector('.save-message');
 
+        // Load note for day
+        fetch('/get_note', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({year: year, month: month, day: day})
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.note) {
+                textarea.value = data.note;
+            }
+        });
+
+        // Save note onclick
+        saveBtn.addEventListener('click', () => {
+            const note = textarea.value;
+            fetch('/save_note', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({year: year, month: month, day: day, note: note})
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    msg.style.display = 'block';
+                    setTimeout(() => {
+                        msg.style.display = 'none';
+                    }, 1500);
+                }
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

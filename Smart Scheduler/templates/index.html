@@ -25,7 +25,89 @@
     </div>
   </main>
   <footer>
-    <p>Made for productivity & hackathon success!</p>
+    <p>Made for productivity</p>
   </footer>
+<!-- Paintbrush Icon -->
+<div id="theme-toggler" title="Customize Theme">
+  <svg viewBox="0 0 24 24">
+    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0L14.13 5.5l3.75 3.75 2.83-2.83z"/>
+  </svg>
+</div>
+
+<!-- Theme Panel -->
+<div id="theme-panel">
+  <h3>Select Theme</h3>
+  <div class="theme-presets">
+    <div class="theme-button" data-theme="light">Light</div>
+    <div class="theme-button" data-theme="dark">Dark</div>
+    <div class="theme-button" data-theme="normal">Normal</div>
+    <div class="theme-button" data-theme="custom">Custom</div>
+  </div>
+  <form id="custom-theme-form" style="display:none;">
+    <label>Background</label>
+    <input type="color" id="bg-color" value="#18132b">
+    <label>Text</label>
+    <input type="color" id="text-color" value="#ffffff">
+    <label>Accent</label>
+    <input type="color" id="accent-color" value="#4aa3ff">
+    <button type="button" id="apply-custom-btn">Apply</button>
+  </form>
+</div>
+<script>
+const toggler = document.getElementById('theme-toggler');
+const panel = document.getElementById('theme-panel');
+const presets = document.querySelectorAll('.theme-button');
+const customForm = document.getElementById('custom-theme-form');
+const applyBtn = document.getElementById('apply-custom-btn');
+
+function setThemeColors(bg, text) {
+  document.documentElement.style.setProperty('--bg-color', bg);
+  document.documentElement.style.setProperty('--text-color', text);
+}
+
+function applyTheme(theme) {
+  if (theme === 'light') {
+    setThemeColors('#ffffff', '#000000');
+  } else if (theme === 'dark') {
+    setThemeColors('#18132b', '#ffffff');
+  } else if (theme === 'normal') {
+    setThemeColors('#ececec', '#222222');
+  } else if (theme === 'custom') {
+    const bg = localStorage.getItem('customThemeBg') || '#18132b';
+    const text = localStorage.getItem('customThemeText') || '#ffffff';
+    setThemeColors(bg, text);
+  }
+  localStorage.setItem('smartSchedulerTheme', theme);
+}
+
+function loadTheme() {
+  const theme = localStorage.getItem('smartSchedulerTheme') || 'dark';
+  applyTheme(theme);
+}
+
+toggler.addEventListener('click', () => {
+  panel.classList.toggle('open');
+});
+
+presets.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const theme = btn.dataset.theme;
+    customForm.style.display = (theme === 'custom') ? 'block' : 'none';
+    applyTheme(theme);
+  });
+});
+
+applyBtn.addEventListener('click', () => {
+  const bg = document.getElementById('bg-color').value;
+  const text = document.getElementById('text-color').value;
+  localStorage.setItem('customThemeBg', bg);
+  localStorage.setItem('customThemeText', text);
+  applyTheme('custom');
+});
+
+window.addEventListener('DOMContentLoaded', loadTheme);
+</script>
+
+  
 </body>
 </html>

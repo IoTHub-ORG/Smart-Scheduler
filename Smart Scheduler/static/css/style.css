@@ -1,3 +1,42 @@
+:root {
+  --bg-color: #18132b;
+  --text-color: #ffffff;
+}
+
+html, body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+*, *::before, *::after {
+  color: var(--text-color) !important;
+  border-color: var(--text-color) !important;
+}
+
+input, select, textarea, button {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  border: 1px solid var(--text-color) !important;
+}
+
+a {
+  color: var(--text-color) !important;
+}
+
+table, th, td {
+  border-color: var(--text-color) !important;
+}
+
+.hdr-gradient {
+  background-color: var(--bg-color) !important;
+  background-image: none !important;
+}
+
+.card, .container, .pomodoro-container, .calendar-table, .todo-container, .events-container {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
   background: #120d18;
@@ -6,42 +45,48 @@ body {
 }
 
 .hdr-gradient {
-  background: linear-gradient(90deg, #24243e 70%, #2274a5 100%);
-  padding: 28px 8px 18px 8px;
+  padding-top: 8px;      /* reduced top padding */
+  padding-bottom: 10px;  /* optional bottom padding */
+  margin-top: 0;         /* no top margin */
   text-align: center;
   letter-spacing: 2px;
   border-bottom: 3px solid #2274a5;
+  background: none !important;
 }
 
 .cool-title {
   font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif;
-  font-size: 3rem;
-  margin-bottom: 0;
-  background: linear-gradient(90deg, #19b3da, #2274a5 30%, #d8214b, #ff3445);
-  color: transparent;
+  font-size: 3rem;       /* keep original size */
+  margin: 0;             /* remove margins */
+  background: linear-gradient(90deg, #ff6a00, #ee0979, #00d2ff, #003973);
   -webkit-background-clip: text;
   background-clip: text;
+  color: transparent;
+  user-select: none;
 }
+
 
 #motivational-quote {
   color: #fff;
   font-size: 1.13rem;
   font-weight: 500;
-  margin: 10px 0 0 0;
+  margin: 20px 0 0 0;
   letter-spacing: 1px;
 }
 
 .dashboard {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start; /* Align items to the left */
   gap: 24px;
   padding: 36px 0 15px 0;
   min-height: 340px;
 }
 
+
 .feature-card {
-  width: 220px;
+  width: 90%;
+  max-width: 400px;
   height: 120px;
   display: flex;
   align-items: center;
@@ -154,25 +199,111 @@ footer {
 }
 
 .animate-fade {
-    animation: fadeIn 0.8s ease-in-out;
+  animation: fadeIn 0.8s ease-in-out;
 }
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 .timer-glow {
-    text-shadow: 0 0 10px #4aa3ff, 0 0 20px #1db9c3;
-    animation: pulse 1s infinite alternate;
+  text-shadow: 0 0 10px #4aa3ff, 0 0 20px #1db9c3;
+  animation: pulse 1s infinite alternate;
 }
 @keyframes pulse {
-    from { text-shadow: 0 0 10px #4aa3ff; }
-    to { text-shadow: 0 0 20px #ff3445; }
+  from { text-shadow: 0 0 10px #4aa3ff; }
+  to { text-shadow: 0 0 20px #ff3445; }
 }
 .calendar-table td {
-    transition: background 0.3s, transform 0.2s;
+  transition: background 0.3s, transform 0.2s;
 }
 .calendar-table td:hover {
-    background: #1db9c3;
-    color: #fff;
-    transform: scale(1.1);
+  background: #1db9c3;
+  color: #fff;
+  transform: scale(1.1);
+}
+#theme-toggler {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  z-index: 99999;
+  background: rgba(0,0,0,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#theme-toggler svg {
+  width: 28px;
+  height: 28px;
+  fill: #4aa3ff;
+}
+
+#theme-panel {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: #18132b;
+  color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 99998;
+  display: none;
+  width: 260px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.6);
+}
+
+#theme-panel.open {
+  display: block;
+}
+
+.theme-presets {
+  display: flex;
+  justify-content: space-between;
+}
+
+.theme-button {
+  background: #349cff;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #fff;
+  flex: 1;
+  margin: 0 2px;
+  text-align: center;
+}
+
+.animate-fade {
+  animation: fadeIn 0.7s ease-in-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.todo-item, .event-item {
+  transition: all 0.25s ease-in-out;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.todo-item:hover, .event-item:hover {
+  box-shadow: 0 0 15px var(--text-color);
+  transform: scale(1.02);
+}
+
+.todo-done {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
+
+button, .btn {
+  transition: all 0.25s ease;
+}
+button:hover, .btn:hover {
+  box-shadow: 0 0 12px var(--text-color);
+  transform: scale(1.05);
 }

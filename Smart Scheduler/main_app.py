@@ -1,13 +1,18 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from datetime import datetime, timedelta
-import random, calendar
+import random
+import calendar
 
 app = Flask(__name__)
 
 # ===================== GLOBALS =====================
 users_tasks = {}
 events = []
-themes = ["light", "dark", "blue", "red", "green", "purple", "orange", "pink", "gray", "black", "yellow", "cyan"]
+
+themes = [
+    "light", "dark", "blue", "red", "green", "purple",
+    "orange", "pink", "gray", "black", "yellow", "cyan"
+]
 current_theme = "dark"
 
 daily_quotes = [
@@ -27,8 +32,9 @@ daily_quotes = [
     "The time is always right to do what is right",
 ]
 
-# Pomodoro sessions per user
 pomodoro_sessions = {}
+
+planner_notes = {}
 
 # ===================== ROUTES =====================
 
@@ -37,8 +43,22 @@ def home():
     quote = random.choice(daily_quotes)
     return render_template('index.html', theme=current_theme, quote=quote, themes=themes)
 
+@app.route('/get_note', methods=['POST'])
+def get_note():
+    data = request.json
+    key = f"{data['year']:04d}-{data['month']:02d}-{data['day']:02d}"
+    note = planner_notes.get(key, "")
+    return jsonify({"note": note})
+
+@app.route('/save_note', methods=['POST'])
+def save_note():
+    data = request.json
+    key = f"{data['year']:04d}-{data['month']:02d}-{data['day']:02d}"
+    planner_notes[key] = data.get('note', "")
+    return jsonify({"success": True})
 
 # ---------- TO-DO ----------
+
 @app.route('/todo', methods=['GET', 'POST'])
 def todo():
     user = 'default_user'
@@ -51,7 +71,6 @@ def todo():
     tasks = users_tasks.get(user, [])
     return render_template('todo.html', tasks=tasks, theme=current_theme)
 
-
 @app.route('/todo/toggle/<int:task_id>')
 def toggle_task(task_id):
     user = 'default_user'
@@ -60,8 +79,16 @@ def toggle_task(task_id):
         tasks[task_id]['done'] = not tasks[task_id]['done']
     return redirect(url_for('todo'))
 
+@app.route('/todo/delete/<int:task_id>', methods=['POST'])
+def delete_task(task_id):
+    user = 'default_user'
+    tasks = users_tasks.get(user, [])
+    if 0 <= task_id < len(tasks):
+        tasks.pop(task_id)
+    return redirect(url_for('todo'))
 
 # ---------- EVENTS ----------
+
 @app.route('/events', methods=['GET', 'POST'])
 def manage_events():
     global events
@@ -72,15 +99,22 @@ def manage_events():
         return redirect(url_for('manage_events'))
     return render_template('events.html', events=events, theme=current_theme)
 
+@app.route('/events/delete/<int:event_id>', methods=['POST'])
+def delete_event(event_id):
+    global events
+    if 0 <= event_id < len(events):
+        events.pop(event_id)
+    return redirect(url_for('manage_events'))
 
 # ---------- CALENDAR ----------
+
 @app.route('/calendar')
 def calendar_view():
-    year = request.args.get('year', 2025, type=int)
-    month = request.args.get('month', 8, type=int)
+    year = request.args.get('year', datetime.now().year, type=int)
+    month = request.args.get('month', datetime.now().month, type=int)
     cal = calendar.monthcalendar(year, month)
     month_name = calendar.month_name[month]
-    week_header = list(calendar.day_abbr)  # ['Mon', 'Tue', ...]
+    week_header = list(calendar.day_abbr)
     return render_template(
         'calendar.html',
         theme=current_theme,
@@ -89,11 +123,11 @@ def calendar_view():
         month_name=month_name,
         week_header=week_header,
         cal=cal,
-        calendar=calendar  # pass module to template
+        calendar=calendar
     )
 
-
 # ---------- POMODORO ----------
+
 @app.route('/pomodoro', methods=['GET', 'POST'])
 def pomodoro():
     user = 'default_user'
@@ -105,7 +139,6 @@ def pomodoro():
         custom_work = int(request.form.get('custom_work', default_work))
         custom_break = int(request.form.get('custom_break', default_break))
 
-        # set times
         if preset == 'custom':
             work, brk = custom_work, custom_break
         elif preset == '25-10':
@@ -123,7 +156,7 @@ def pomodoro():
                 'end_time': datetime.now() + timedelta(seconds=work * 60),
                 'buzzer': False
             }
-        elif action == 'stop':  # pause
+        elif action == 'stop':
             sess = pomodoro_sessions.get(user)
             if sess:
                 sess['end_time'] = None
@@ -137,7 +170,6 @@ def pomodoro():
     session = pomodoro_sessions.get(user)
     return render_template('pomodoro.html', session=session, theme=current_theme)
 
-
 @app.route('/pomodoro/status')
 def pomodoro_status():
     user = 'default_user'
@@ -150,11 +182,10 @@ def pomodoro_status():
 
     remaining = int((sess['end_time'] - datetime.now()).total_seconds())
 
-    # buzzer logic
     if remaining <= 0:
         if not sess.get('buzzer', False):
             sess['buzzer'] = True
-            sess['buzzer_stop_time'] = datetime.now() + timedelta(seconds=60)  # 1 min buzzer
+            sess['buzzer_stop_time'] = datetime.now() + timedelta(seconds=60)
         if datetime.now() > sess.get('buzzer_stop_time', datetime.now()):
             sess['buzzer'] = False
         sess['end_time'] = None
@@ -168,8 +199,8 @@ def pomodoro_status():
         'buzzer': sess.get('buzzer', False)
     })
 
-
 # ---------- THEMES ----------
+
 @app.route('/themes', methods=['POST'])
 def change_theme():
     global current_theme
@@ -179,19 +210,18 @@ def change_theme():
         return jsonify({'status': 'success', 'theme': theme})
     return jsonify({'status': 'error', 'message': 'Invalid theme'})
 
-
 # ---------- EXTRA ----------
+
 @app.route('/quote')
 def get_quote():
     return jsonify({'quote': random.choice(daily_quotes)})
-
 
 @app.route('/time')
 def get_time():
     now = datetime.now()
     return jsonify({'time': now.strftime('%H:%M:%S'), 'date': now.strftime('%Y-%m-%d')})
 
-
 # ===================== MAIN =====================
+
 if __name__ == '__main__':
     app.run(debug=True)

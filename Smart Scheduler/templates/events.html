@@ -1,24 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Events - Smart Scheduler</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<meta charset="UTF-8" />
+<title>📅 Events - Smart Scheduler</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+    .events-container {
+        max-width: 700px;
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 12px;
+        background-color: var(--bg-color);
+        animation: fadeIn 0.6s ease-in-out;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+    .event-item {
+        padding: 14px 18px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        background-color: var(--bg-color);
+        transition: all 0.25s ease-in-out;
+        border: 1px solid var(--text-color);
+        font-weight: 700;
+        font-size: 1.3rem;
+        letter-spacing: 0.5px;
+        text-shadow: 0 0 3px var(--text-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .event-item:hover {
+        box-shadow: 0 0 15px var(--text-color);
+        transform: scale(1.02);
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .events-container input, .events-container button {
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        margin-right: 5px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    .events-container button:hover {
+        box-shadow: 0 0 10px var(--text-color);
+        transform: scale(1.05);
+    }
+    .event-actions form button {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        border: 1px solid var(--text-color);
+        border-radius: 6px;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.25s ease;
+    }
+    .event-actions form button:hover {
+        box-shadow: 0 0 12px var(--text-color);
+        transform: scale(1.1);
+    }
+</style>
 </head>
-<body class="{{ theme }}">
-  <h2>Events</h2>
-  <form method="post" action="{{ url_for('manage_events') }}">
-    <input type="text" name="name" placeholder="Event Name" required />
-    <input type="date" name="date" required />
-    <button type="submit">Add Event</button>
-  </form>
-  <ul>
+<body>
+<header class="hdr-gradient">
+    <h1 class="cool-title">📅 Events</h1>
+</header>
+
+<div class="events-container">
+    <form method="post" action="{{ url_for('manage_events') }}">
+        <input type="text" name="name" placeholder="Event Name" required />
+        <input type="date" name="date" required />
+        <button type="submit">➕ Add Event</button>
+    </form>
+
     {% for event in events %}
-    <li>{{ event.name }} - {{ event.date }}</li>
+        <div class="event-item">
+            <span>{{ event.name }} — {{ event.date }}</span>
+            <div class="event-actions">
+                <form method="post" action="{{ url_for('delete_event', event_id=loop.index0) }}">
+                    <button type="submit" title="Delete event">❌</button>
+                </form>
+            </div>
+        </div>
     {% else %}
-    <li>No events added.</li>
+        <p style="font-weight:700; font-size:1.1rem; text-shadow:0 0 3px var(--text-color);">
+            No events added yet. 🗓
+        </p>
     {% endfor %}
-  </ul>
-  <a href="{{ url_for('home') }}">Back to Home</a>
+
+    <div style="margin-top: 15px; text-align: center;">
+        <a href="{{ url_for('home') }}">&#8592; Back to Home</a>
+    </div>
+</div>
+
 </body>
 </html>

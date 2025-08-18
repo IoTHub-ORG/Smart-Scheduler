@@ -1,0 +1,7 @@
+Flask>=2.0
+gunicorn
+Flask-SQLAlchemy
+Flask-Login
+Flask-WTF
+Flask-Bcrypt
+requests

@@ -3,111 +3,314 @@
 <head>
   <meta charset="UTF-8" />
   <title>Smart Scheduler</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&family=Montserrat:wght@900&family=Cooper+Black&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --main-font: 'Cooper Black', Arial Black, Arial, sans-serif;
+      --clock-font: 'Montserrat', 'Poppins', 'Arial Rounded MT Bold', Arial, sans-serif;
+      --clock-size: 10rem;
+      --feature-radius: 175px;
+      --feature-btn-size: 90px;
+      --container-width: 680px;
+      --container-min-width: 350px;
+      --feature-cx: 210px;
+      --feature-cy: 190px;
+      --feature-label-width: 215px;
+      --feature-label-height: 58px;
+      --feature-label-left: 85px;
+      --feature-label-top: 49%;
+      --main-title-size: 2.4rem;
+      --quote-size: 1.6rem;
+      --date-size: 2.6rem;
+      --main-margin: 32px;
+      --main-bg: linear-gradient(135deg, #151536 0%, #191942 100%);
+      --main-text: #e8eaf6;
+      --features-bg: linear-gradient(120deg, #191942 50%, #2274a5 100%);
+    }
+    html, body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+      font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+      background: var(--main-bg);
+      color: var(--main-text);
+      overflow-x: hidden;
+      transition: background 0.3s;
+    }
+    body {
+      position: relative;
+      min-height: 100vh;
+      width: 100vw;
+    }
+    .smart-title {
+      position: absolute;
+      top: var(--main-margin);
+      left: var(--main-margin);
+      font-family: var(--main-font);
+      font-size: var(--main-title-size);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      color: var(--main-text);
+      z-index: 50;
+      pointer-events: none;
+      user-select: none;
+      transition: color 0.3s;
+    }
+    .quote-box {
+      position: absolute;
+      top: 90px;
+      right: 60px;
+      font-family: var(--main-font);
+      font-size: var(--quote-size);
+      font-weight: bold;
+      color: var(--main-text);
+      text-shadow: 0 2px 8px #349cff45;
+      z-index: 60;
+      background: rgba(34, 116, 165, 0.15);
+      border-radius: 12px;
+      padding: 10px 26px;
+      user-select: none;
+      transition: color 0.3s, font-size 0.3s;
+    }
+    .center-container {
+      position: absolute;
+      top: 50%;
+      left: 57%;
+      transform: translate(-50%, -54%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 40;
+      width: var(--container-width);
+      min-width: var(--container-min-width);
+    }
+    .digital-clock {
+      font-family: var(--clock-font);
+      font-size: var(--clock-size);
+      font-weight: 900;
+      letter-spacing: 0.07em;
+      text-shadow: 0 2px 22px #277ad9bb;
+      text-align: center;
+      margin: 0 0 0.4em 0;
+      padding: 0;
+      width: 100%;
+      line-height: 1.07;
+      pointer-events: none;
+      color: var(--main-text);
+      user-select: none;
+      transition: color 0.3s, font-size 0.3s;
+    }
+    .clock-date {
+      font-size: var(--date-size);
+      color: var(--main-text);
+      letter-spacing: 0.07em;
+      font-weight: bold;
+      font-family: 'Montserrat', Arial, sans-serif;
+      text-shadow: 0 2px 10px #277ad988;
+      text-align: center;
+      margin-top: -6px;
+      width: 100%;
+      pointer-events: none;
+      user-select: none;
+      transition: color 0.3s, font-size 0.3s;
+    }
+    .feature-semicol-container {
+      position: absolute;
+      left: 0;
+      top: 54%;
+      transform: translateY(-50%);
+      width: 410px;
+      height: 390px;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .feature-semicol-bg {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      border-top-right-radius: 320px;
+      border-bottom-right-radius: 320px;
+      background: var(--features-bg);
+      box-shadow: 0 2px 28px #2274a566;
+      z-index: 1;
+      pointer-events: none;
+      transition: background 0.4s;
+    }
+    .features-arc {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      transition: transform 2.2s cubic-bezier(.84,-0.55,.27,1.2);
+    }
+    .feature-btn {
+      position: absolute;
+      width: var(--feature-btn-size);
+      height: var(--feature-btn-size);
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #23253b 70%, #2274a5 120%);
+      font-size: 2.5rem;
+      color: #fff;
+      box-shadow: 0 2px 15px #2274a588;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 3;
+      pointer-events: auto;
+      transition: background 0.23s, color 0.2s, box-shadow 0.3s, transform 0.8s cubic-bezier(.68,-0.55,.27,1.4), font-size 0.3s;
+      font-family: var(--main-font);
+      opacity: 1 !important;
+      filter: none !important;
+    }
+    .feature-btn.active {
+      background: linear-gradient(135deg, #349cff 30%, #2274a5 90%);
+      color: #fff;
+      transform: scale(1.14) rotate(10deg);
+      box-shadow: 0 7px 25px #003973aa;
+      z-index: 4;
+      opacity: 1 !important;
+      filter: none !important;
+    }
+    .feature-btn:not(.active) {
+      opacity: 1 !important;
+      filter: none !important;
+    }
+    .features-label-preview {
+      position: absolute;
+      left: var(--feature-label-left);
+      top: var(--feature-label-top);
+      transform: translateY(-50%);
+      width: var(--feature-label-width);
+      height: var(--feature-label-height);
+      font-family: var(--main-font);
+      font-size: 1.38rem;
+      color: var(--main-text);
+      text-align: center;
+      background: rgba(22,40,66,0.90);
+      border-radius: 15px;
+      box-shadow: 0 3px 14px #2274a542;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      z-index: 199;
+      font-weight: 700;
+      transition: background 0.3s, color 0.3s, font-size 0.3s;
+      letter-spacing: 0.08em;
+    }
+    .features-label-preview.active { display: flex; }
+    @media (max-width:900px){
+      :root {
+        --clock-size: 3.1rem;
+        --feature-radius: 80px;
+        --feature-btn-size: 34px;
+        --feature-cx: 61px;
+        --feature-cy: 65px;
+        --feature-label-width: 52px;
+        --feature-label-height: 22px;
+        --feature-label-left: 22px;
+        --main-title-size: 1.1rem;
+        --container-width: 180px;
+        --date-size: 1rem;
+        --quote-size: .85rem;
+        --main-margin: 10px;
+      }
+      .center-container{width:92vw; left:54vw;}
+      .feature-semicol-container{width:148px;height:134px;}
+      .feature-semicol-bg{width:148px;height:134px;}
+    }
+  </style>
 </head>
 <body>
-  <header class="hdr-gradient">
-    <h1 class="cool-title">Smart Scheduler</h1>
-    <p id="motivational-quote">{{ quote }}</p>
-  </header>
-  <main class="dashboard">
-    <div class="feature-card card-blue">
-      <a href="{{ url_for('todo') }}">📝 To-Do List</a>
-    </div>
-    <div class="feature-card card-red">
-      <a href="{{ url_for('manage_events') }}">📅 Events</a>
-    </div>
-    <div class="feature-card card-cyan">
-      <a href="{{ url_for('pomodoro') }}">⏱️ Pomodoro</a>
-    </div>
-    <div class="feature-card card-violet">
-      <a href="{{ url_for('calendar_view') }}">🗓️ Calendar</a>
-    </div>
-  </main>
-  <footer>
-    <p>Made for productivity</p>
-  </footer>
-<!-- Paintbrush Icon -->
-<div id="theme-toggler" title="Customize Theme">
-  <svg viewBox="0 0 24 24">
-    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0L14.13 5.5l3.75 3.75 2.83-2.83z"/>
-  </svg>
-</div>
-
-<!-- Theme Panel -->
-<div id="theme-panel">
-  <h3>Select Theme</h3>
-  <div class="theme-presets">
-    <div class="theme-button" data-theme="light">Light</div>
-    <div class="theme-button" data-theme="dark">Dark</div>
-    <div class="theme-button" data-theme="normal">Normal</div>
-    <div class="theme-button" data-theme="custom">Custom</div>
+  <div class="smart-title" id="smartTitle">SMART SCHEDULER</div>
+  <div class="quote-box">{{ quote }}</div>
+  <div class="center-container">
+    <div class="digital-clock" id="digitalClock"></div>
+    <div class="clock-date" id="digitalDate"></div>
   </div>
-  <form id="custom-theme-form" style="display:none;">
-    <label>Background</label>
-    <input type="color" id="bg-color" value="#18132b">
-    <label>Text</label>
-    <input type="color" id="text-color" value="#ffffff">
-    <label>Accent</label>
-    <input type="color" id="accent-color" value="#4aa3ff">
-    <button type="button" id="apply-custom-btn">Apply</button>
-  </form>
-</div>
-<script>
-const toggler = document.getElementById('theme-toggler');
-const panel = document.getElementById('theme-panel');
-const presets = document.querySelectorAll('.theme-button');
-const customForm = document.getElementById('custom-theme-form');
-const applyBtn = document.getElementById('apply-custom-btn');
+  <div class="feature-semicol-container">
+    <div class="feature-semicol-bg" id="featuresBg"></div>
+    <div class="features-arc" id="featuresArc">
+      <button class="feature-btn" id="btn-todo" title="To-Do" data-label="To-Do" onclick="location.href='{{ url_for('todo') }}'">&#x1F4DD;</button>
+      <button class="feature-btn" id="btn-pomodoro" title="Pomodoro" data-label="Pomodoro" onclick="location.href='{{ url_for('pomodoro') }}'">&#x23F1;</button>
+      <button class="feature-btn" id="btn-events" title="Events" data-label="Events" onclick="location.href='{{ url_for('manage_events') }}'">&#x1F4C5;</button>
+      <button class="feature-btn" id="btn-calendar" title="Calendar" data-label="Calendar" onclick="location.href='{{ url_for('calendar_view') }}'">&#x1F5D3;</button>
+    </div>
+    <div class="features-label-preview" id="featuresLabelPreview"></div>
+  </div>
+  <script>
+    function updateDigitalClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('digitalClock').textContent = `${h}:${m}`;
+      const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const day = days[now.getDay()];
+      const date = now.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
+      document.getElementById('digitalDate').textContent = `${day}, ${date}`;
+    }
+    setInterval(updateDigitalClock, 1000); updateDigitalClock();
 
-function setThemeColors(bg, text) {
-  document.documentElement.style.setProperty('--bg-color', bg);
-  document.documentElement.style.setProperty('--text-color', text);
-}
-
-function applyTheme(theme) {
-  if (theme === 'light') {
-    setThemeColors('#ffffff', '#000000');
-  } else if (theme === 'dark') {
-    setThemeColors('#18132b', '#ffffff');
-  } else if (theme === 'normal') {
-    setThemeColors('#ececec', '#222222');
-  } else if (theme === 'custom') {
-    const bg = localStorage.getItem('customThemeBg') || '#18132b';
-    const text = localStorage.getItem('customThemeText') || '#ffffff';
-    setThemeColors(bg, text);
-  }
-  localStorage.setItem('smartSchedulerTheme', theme);
-}
-
-function loadTheme() {
-  const theme = localStorage.getItem('smartSchedulerTheme') || 'dark';
-  applyTheme(theme);
-}
-
-toggler.addEventListener('click', () => {
-  panel.classList.toggle('open');
-});
-
-presets.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const theme = btn.dataset.theme;
-    customForm.style.display = (theme === 'custom') ? 'block' : 'none';
-    applyTheme(theme);
-  });
-});
-
-applyBtn.addEventListener('click', () => {
-  const bg = document.getElementById('bg-color').value;
-  const text = document.getElementById('text-color').value;
-  localStorage.setItem('customThemeBg', bg);
-  localStorage.setItem('customThemeText', text);
-  applyTheme('custom');
-});
-
-window.addEventListener('DOMContentLoaded', loadTheme);
-</script>
-
-  
+    // Feature arc logic
+    const arc = document.getElementById('featuresArc');
+    const btns = arc.querySelectorAll('.feature-btn');
+    const preview = document.getElementById('featuresLabelPreview');
+    let activeIdx = 2;
+    let hoverTimeout = null;
+    const featureLabels = Array.from(btns).map(b=>b.getAttribute('data-label'));
+    // Variables in px as per :root variables
+    function getVar(name) {
+      return parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
+    }
+    function positionButtons(idxActive = activeIdx) {
+      const n = btns.length;
+      const startAngle = -90, endAngle = 90;
+      const step = (endAngle - startAngle)/(n-1);
+      const radius = getVar('--feature-radius');
+      const btnSize = getVar('--feature-btn-size');
+      const cx = getVar('--feature-cx');
+      const cy = getVar('--feature-cy');
+      btns.forEach((btn, i) => {
+        const angle = startAngle + step*i;
+        const rad = angle * Math.PI / 180;
+        btn.style.left = (cx + radius*Math.cos(rad) - btnSize/2) + 'px';
+        btn.style.top = (cy + radius*Math.sin(rad) - btnSize/2) + 'px';
+        btn.classList.toggle('active', i === idxActive);
+        btn.style.opacity = "1";
+        btn.style.filter = "none";
+      });
+      let rotateDeg = -(startAngle + step*idxActive);
+      arc.style.transition = 'transform 2.2s cubic-bezier(.84,-0.55,.27,1.2)';
+      arc.style.transform = `rotate(${rotateDeg}deg)`;
+      preview.classList.toggle('active', true);
+      preview.textContent = featureLabels[idxActive];
+      preview.style.color = getComputedStyle(document.documentElement).getPropertyValue('--main-text');
+    }
+    btns.forEach((btn, i) => {
+      btn.addEventListener('mouseenter', ()=> {
+        if (hoverTimeout) clearTimeout(hoverTimeout);
+        hoverTimeout = setTimeout(()=>{
+          positionButtons(i); activeIdx=i;
+        }, 260);
+      });
+      btn.addEventListener('mouseleave', ()=> {
+        if (hoverTimeout) clearTimeout(hoverTimeout);
+        hoverTimeout = setTimeout(()=>{
+          positionButtons(activeIdx);
+          preview.textContent = featureLabels[activeIdx];
+        }, 180);
+      });
+      btn.addEventListener('click', ()=> {
+        positionButtons(i); activeIdx=i;
+      });
+    });
+    positionButtons();
+  </script>
 </body>
 </html>
